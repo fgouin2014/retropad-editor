@@ -1,5 +1,5 @@
 {
-  "name": "retropad-editor",
+  "name": "retropad-local-editor",
   "version": "1.0.0",
   "description": "Online tool to create and edit onscreen gamepads for RetroArch.",
   "main": "main.js",
@@ -8,8 +8,8 @@
     "build": "electron-builder -w"
   },
   "build": {
-    "appId": "com.retropad.editor",
-    "productName": "RetroPad Editor",
+    "appId": "com.retropad.localeditor",
+    "productName": "RetroPad Local Editor",
     "directories": {
       "output": "dist"
     },
