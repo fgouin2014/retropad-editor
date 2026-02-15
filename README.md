@@ -16,6 +16,25 @@ Features:
 Config file and images must be stored in same folder.
 On most Android devices RetroArch will open config only from internal memory even access to sdcard is granted.
 - This editor can load but NOT save configs with image paths (img/A.png will be saved as A.png)
+
+## Standalone Windows Application
+
+This project can be built as a standalone portable Windows application.
+
+### Build Instructions
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Build portable executable:
+   ```bash
+   npm run build
+   ```
+
+The executable will be located in the `dist` folder.
+
 ---
 Libretro Docs: https://docs.libretro.com/development/retroarch/input/overlay/
 

@@ -1,0 +1,41 @@
+{
+  "name": "retropad-editor",
+  "version": "1.0.0",
+  "description": "Online tool to create and edit onscreen gamepads for RetroArch.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder -w"
+  },
+  "build": {
+    "appId": "com.retropad.editor",
+    "productName": "RetroPad Editor",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "portable",
+      "icon": "img/icon.ico"
+    },
+    "files": [
+      "**/*",
+      "!dist/*"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fgouin2014/retropad-editor.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/fgouin2014/retropad-editor/issues"
+  },
+  "homepage": "https://github.com/fgouin2014/retropad-editor#readme",
+  "devDependencies": {
+    "electron": "^40.4.1",
+    "electron-builder": "^26.7.0"
+  }
+}
