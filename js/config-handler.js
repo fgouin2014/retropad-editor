@@ -20,9 +20,29 @@ function ConfigHandler() {
 	}
 
 
-	this.getConfigString = function () {
+	this.getConfigString = function (imagePathPrefix) {
 		_cleanUp();
-		return _strings.join('\n');
+
+		if (!imagePathPrefix) {
+			return _strings.join('\n');
+		}
+
+		let result = [];
+		for (let i = 0; i < _strings.length; i++) {
+			let line = _strings[i];
+			// if line ends with _overlay = ...
+			if (line.match(/_overlay\s*=/)) {
+				let param = line.split('=')[0].trim();
+				let value = line.split('=')[1].trim();
+				let inQuotes = value.startsWith('"');
+				let cleanValue = inQuotes ? value.slice(1, -1) : value;
+
+				line = `${param} = ${inQuotes ? '"' : ''}${imagePathPrefix}${cleanValue}${inQuotes ? '"' : ''}`;
+			}
+			result.push(line);
+		}
+
+		return result.join('\n');
 	}
 
 
