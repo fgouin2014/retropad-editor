@@ -105,8 +105,17 @@ document.getElementById('image-name').addEventListener('input', e => showImagePr
 document.getElementById('load-config').addEventListener('change', loadConfigFromFile);
 document.getElementById('load-button-images').addEventListener('change', loadImageFiles);
 document.getElementById('load-screenshot').addEventListener('change', loadScreenshotFile);
-document.getElementById('chk-show-screenshot').addEventListener('change', toggleScreenshot);
 
+function copySelectionAll() {
+	copySelectionXY();
+	copySelectionS();
+}
+
+function pasteSelectionAll() {
+	if (!conf.isGroupSelected()) return;
+	pasteSelectionXY();
+	pasteSelectionS();
+}
 
 function copySelectionXY() {
 	clipboardXY.x = document.getElementById('selection-x-number').value;
