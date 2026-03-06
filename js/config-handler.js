@@ -656,8 +656,11 @@ function ConfigHandler() {
 	// --- D-PAD LOGIC ---
 	
 	const dpadCommands = [
+		'up', 'down', 'left', 'right',
+		'left|up', 'right|up', 'left|down', 'right|down',
 		'dpad_up', 'dpad_down', 'dpad_left', 'dpad_right',
-		'dpad_left|up', 'dpad_right|up', 'dpad_left|down', 'dpad_right|down'
+		'dpad_left|up', 'dpad_right|up', 'dpad_left|down', 'dpad_right|down',
+		'null', 'analog_left'
 	];
 
 	this.getDPadIndexes = function() {
