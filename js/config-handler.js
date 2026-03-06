@@ -115,14 +115,14 @@ function ConfigHandler() {
 					_strings[index] = _editParamSection(_strings[index], 'y', confValue.toFixed(10));
 					break;
 				case 's':
-					value = Math.max(value, 0.01);
+					let multiplier = Math.max(value, 0.001);
 					// Scale w and h
-					_strings[index] = _editParamSection(_strings[index], 'w', (w * value).toFixed(10));
-					_strings[index] = _editParamSection(_strings[index], 'h', (h * value).toFixed(10));
+					_strings[index] = _editParamSection(_strings[index], 'w', (w * multiplier).toFixed(10));
+					_strings[index] = _editParamSection(_strings[index], 'h', (h * multiplier).toFixed(10));
 					// Scale distance from center
-					confValue = center.x + (x - center.x) * value;
+					confValue = center.x + (x - center.x) * multiplier;
 					_strings[index] = _editParamSection(_strings[index], 'x', confValue.toFixed(10));
-					confValue = center.y + (y - center.y) * value;
+					confValue = center.y + (y - center.y) * multiplier;
 					_strings[index] = _editParamSection(_strings[index], 'y', confValue.toFixed(10));
 					break;
 			}

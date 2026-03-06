@@ -10,6 +10,8 @@ const manualScaleParams = 'block_x_separation = false\nblock_y_separation = fals
 
 let importedFilename = 'retropad.cfg';
 let currentRect;
+let lastSValue = 1;
+
 
 let screen = {
 	_width: DEF_WIDTH,
@@ -118,7 +120,14 @@ function applyButtonParam(section, sValue) {
 function applySelectionParam(section, sValue) {
 	if (!conf.isGroupSelected()) return;
 
-	conf.setSelectionSectionValue(section, sValue);
+	let val = Number(sValue);
+	if (section === 's') {
+		let multiplier = val / lastSValue;
+		conf.setSelectionSectionValue('s', multiplier);
+		lastSValue = val;
+	} else {
+		conf.setSelectionSectionValue(section, sValue);
+	}
 	
 	let origLine = currentRect ? Number(currentRect.dataset.lineIndex) : -1;
 	let origRect = currentRect;
@@ -391,6 +400,7 @@ function setEditorControls() {
 	if (sRange && sText) {
 		sRange.value = 1;
 		sText.value = 1;
+		lastSValue = 1;
 	}
 }
 
