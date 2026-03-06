@@ -67,11 +67,25 @@ renderConfig(configStr);
 	range.addEventListener('input', (e) => {
 		applyButtonParam(elem, e.target.value);
 		text.value = e.target.value;
+		// Sync selection sliders
+		if (elem === 'x' || elem === 'y') {
+			let selRange = document.getElementById('selection-' + elem + '-range');
+			let selNum = document.getElementById('selection-' + elem + '-number');
+			if (selRange) selRange.value = e.target.value;
+			if (selNum) selNum.value = e.target.value;
+		}
 	});
 
 	text.addEventListener('input', (e) => {
 		applyButtonParam(elem, e.target.value);
 		range.value = e.target.value;
+		// Sync selection sliders
+		if (elem === 'x' || elem === 'y') {
+			let selRange = document.getElementById('selection-' + elem + '-range');
+			let selNum = document.getElementById('selection-' + elem + '-number');
+			if (selRange) selRange.value = e.target.value;
+			if (selNum) selNum.value = e.target.value;
+		}
 	});
 });
 
@@ -105,6 +119,7 @@ document.getElementById('image-name').addEventListener('input', e => showImagePr
 document.getElementById('load-config').addEventListener('change', loadConfigFromFile);
 document.getElementById('load-button-images').addEventListener('change', loadImageFiles);
 document.getElementById('load-screenshot').addEventListener('change', loadScreenshotFile);
+document.getElementById('chk-show-screenshot').addEventListener('change', toggleScreenshot);
 
 function copySelectionAll() {
 	copySelectionXY();
@@ -112,7 +127,7 @@ function copySelectionAll() {
 }
 
 function pasteSelectionAll() {
-	if (!conf.isGroupSelected()) return;
+	if (!conf.isGroupSelected() && !currentRect) return;
 	pasteSelectionXY();
 	pasteSelectionS();
 }
@@ -124,14 +139,18 @@ function copySelectionXY() {
 }
 
 function pasteSelectionXY() {
-	if (!conf.isGroupSelected()) return;
+	if (!conf.isGroupSelected() && !currentRect) return;
 	applySelectionParam('x', clipboardXY.x);
 	applySelectionParam('y', clipboardXY.y);
 	// Update UI inputs to reflect the paste
-	document.getElementById('selection-x-range').value = clipboardXY.x;
-	document.getElementById('selection-x-number').value = clipboardXY.x;
-	document.getElementById('selection-y-range').value = clipboardXY.y;
-	document.getElementById('selection-y-number').value = clipboardXY.y;
+	let xRange = document.getElementById('selection-x-range');
+	let xNum = document.getElementById('selection-x-number');
+	let yRange = document.getElementById('selection-y-range');
+	let yNum = document.getElementById('selection-y-number');
+	if (xRange) xRange.value = clipboardXY.x;
+	if (xNum) xNum.value = clipboardXY.x;
+	if (yRange) yRange.value = clipboardXY.y;
+	if (yNum) yNum.value = clipboardXY.y;
 }
 
 function copySelectionS() {
@@ -140,11 +159,13 @@ function copySelectionS() {
 }
 
 function pasteSelectionS() {
-	if (!conf.isGroupSelected()) return;
+	if (!conf.isGroupSelected() && !currentRect) return;
 	applySelectionParam('s', clipboardS);
 	// Update UI inputs to reflect the paste
-	document.getElementById('selection-s-range').value = clipboardS;
-	document.getElementById('selection-s-number').value = clipboardS;
+	let sRange = document.getElementById('selection-s-range');
+	let sNum = document.getElementById('selection-s-number');
+	if (sRange) sRange.value = clipboardS;
+	if (sNum) sNum.value = clipboardS;
 }
 
 function applyButtonParam(section, sValue) {
@@ -159,29 +180,53 @@ function applyButtonParam(section, sValue) {
 }
 
 function applySelectionParam(section, sValue) {
-	if (!conf.isGroupSelected()) return;
+	if (!conf.isGroupSelected() && !currentRect) return;
 
 	let val = Number(sValue);
 	if (section === 's') {
-		let multiplier = val / lastSValue;
-		conf.setSelectionSectionValue('s', multiplier);
-		lastSValue = val;
+		if (conf.isGroupSelected()) {
+			let multiplier = val / lastSValue;
+			conf.setSelectionSectionValue('s', multiplier);
+			lastSValue = val;
+		} else {
+			// For single button, we don't have a relative multiplier logic yet
+			// so we just scale w and h individually
+			let orLine = currentRect ? Number(currentRect.dataset.lineIndex) : -1;
+			if (orLine !== -1) {
+				let multiplier = val / lastSValue;
+				let w = Number(conf.getCurrentLineSectionValue('w'));
+				let h = Number(conf.getCurrentLineSectionValue('h'));
+				conf.setCurrentLineSectionValue('w', (w * multiplier).toFixed(10));
+				conf.setCurrentLineSectionValue('h', (h * multiplier).toFixed(10));
+				lastSValue = val;
+				updateCurrentLine(null);
+			}
+			return;
+		}
 	} else {
-		conf.setSelectionSectionValue(section, sValue);
+		if (conf.isGroupSelected()) {
+			conf.setSelectionSectionValue(section, sValue);
+		} else {
+			conf.setCurrentLineSectionValue(section, sValue);
+		}
 	}
 	
 	let origLine = currentRect ? Number(currentRect.dataset.lineIndex) : -1;
 	let origRect = currentRect;
 	
-	let indexes = conf.getSelectedIndexes();
-	indexes.forEach((e) => {
-		let elem = document.querySelectorAll('.rect[data-line-index="' + e + '"]');
-		if (elem[0]) {
-			conf.setCurrentLine(e);
-			currentRect = elem[0];
-			updateCurrentLine(null);
-		}
-	});
+	if (conf.isGroupSelected()) {
+		let indexes = conf.getSelectedIndexes();
+		indexes.forEach((e) => {
+			let elem = document.querySelectorAll('.rect[data-line-index="' + e + '"]');
+			if (elem[0]) {
+				conf.setCurrentLine(e);
+				currentRect = elem[0];
+				updateCurrentLine(null);
+			}
+		});
+	} else {
+		updateCurrentLine(null);
+	}
 
 	// Restore selection
 	conf.setCurrentLine(origLine);
