@@ -72,17 +72,17 @@ renderConfig(configStr);
 });
 
 ['x', 'y', 's'].forEach(elem => {
-	let range = document.getElementById('dpad-' + elem + '-range');
-	let text = document.getElementById('dpad-' + elem + '-number');
+	let range = document.getElementById('selection-' + elem + '-range');
+	let text = document.getElementById('selection-' + elem + '-number');
 
 	if(range && text) {
 		range.addEventListener('input', (e) => {
-			applyDPadParam(elem, e.target.value);
+			applySelectionParam(elem, e.target.value);
 			text.value = e.target.value;
 		});
 
 		text.addEventListener('input', (e) => {
-			applyDPadParam(elem, e.target.value);
+			applySelectionParam(elem, e.target.value);
 			range.value = e.target.value;
 		});
 	}
@@ -115,13 +115,15 @@ function applyButtonParam(section, sValue) {
 	}
 }
 
-function applyDPadParam(section, sValue) {
-	conf.setDPadSectionValue(section, sValue);
+function applySelectionParam(section, sValue) {
+	if (!conf.isGroupSelected()) return;
+
+	conf.setSelectionSectionValue(section, sValue);
 	
 	let origLine = currentRect ? Number(currentRect.dataset.lineIndex) : -1;
 	let origRect = currentRect;
 	
-	let indexes = conf.getDPadIndexes();
+	let indexes = conf.getSelectedIndexes();
 	indexes.forEach((e) => {
 		let elem = document.querySelectorAll('.rect[data-line-index="' + e + '"]');
 		if (elem[0]) {
@@ -374,6 +376,22 @@ function setEditorControls() {
 		text.value = Number(size[elem].toFixed(10));
 		range.value = size[elem];
 	});
+
+	// Update the generic Selection group sliders
+	['x', 'y'].forEach(elem => {
+		let range = document.getElementById('selection-' + elem + '-range');
+		let text = document.getElementById('selection-' + elem + '-number');
+		if(range && text) {
+			text.value = Number(size[elem].toFixed(10));
+			range.value = size[elem];
+		}
+	});
+	let sRange = document.getElementById('selection-s-range');
+	let sText = document.getElementById('selection-s-number');
+	if (sRange && sText) {
+		sRange.value = 1;
+		sText.value = 1;
+	}
 }
 
 
