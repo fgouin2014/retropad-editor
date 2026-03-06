@@ -11,6 +11,8 @@ const manualScaleParams = 'block_x_separation = false\nblock_y_separation = fals
 let importedFilename = 'retropad.cfg';
 let currentRect;
 let lastSValue = 1;
+let clipboardXY = { x: 0.5, y: 0.5 };
+let clipboardS = 1;
 
 
 let screen = {
@@ -105,6 +107,36 @@ document.getElementById('load-button-images').addEventListener('change', loadIma
 document.getElementById('load-screenshot').addEventListener('change', loadScreenshotFile);
 document.getElementById('chk-show-screenshot').addEventListener('change', toggleScreenshot);
 
+
+function copySelectionXY() {
+	clipboardXY.x = document.getElementById('selection-x-number').value;
+	clipboardXY.y = document.getElementById('selection-y-number').value;
+	console.log('Copied XY:', clipboardXY);
+}
+
+function pasteSelectionXY() {
+	if (!conf.isGroupSelected()) return;
+	applySelectionParam('x', clipboardXY.x);
+	applySelectionParam('y', clipboardXY.y);
+	// Update UI inputs to reflect the paste
+	document.getElementById('selection-x-range').value = clipboardXY.x;
+	document.getElementById('selection-x-number').value = clipboardXY.x;
+	document.getElementById('selection-y-range').value = clipboardXY.y;
+	document.getElementById('selection-y-number').value = clipboardXY.y;
+}
+
+function copySelectionS() {
+	clipboardS = document.getElementById('selection-s-number').value;
+	console.log('Copied S:', clipboardS);
+}
+
+function pasteSelectionS() {
+	if (!conf.isGroupSelected()) return;
+	applySelectionParam('s', clipboardS);
+	// Update UI inputs to reflect the paste
+	document.getElementById('selection-s-range').value = clipboardS;
+	document.getElementById('selection-s-number').value = clipboardS;
+}
 
 function applyButtonParam(section, sValue) {
 	let value = Number(sValue);
