@@ -71,6 +71,23 @@ renderConfig(configStr);
 	});
 });
 
+['x', 'y', 's'].forEach(elem => {
+	let range = document.getElementById('dpad-' + elem + '-range');
+	let text = document.getElementById('dpad-' + elem + '-number');
+
+	if(range && text) {
+		range.addEventListener('input', (e) => {
+			applyDPadParam(elem, e.target.value);
+			text.value = e.target.value;
+		});
+
+		text.addEventListener('input', (e) => {
+			applyDPadParam(elem, e.target.value);
+			range.value = e.target.value;
+		});
+	}
+});
+
 document.getElementById('chk-show-shapes').addEventListener('change', toggleShapes);
 document.getElementById('chk-show-names').addEventListener('change', toggleNames);
 document.getElementById('chk-show-portrait').addEventListener('change', toggleOrientation);
@@ -96,6 +113,27 @@ function applyButtonParam(section, sValue) {
 	} else {
 		updateCurrentLine(section, value);
 	}
+}
+
+function applyDPadParam(section, sValue) {
+	conf.setDPadSectionValue(section, sValue);
+	
+	let origLine = currentRect ? Number(currentRect.dataset.lineIndex) : -1;
+	let origRect = currentRect;
+	
+	let indexes = conf.getDPadIndexes();
+	indexes.forEach((e) => {
+		let elem = document.querySelectorAll('.rect[data-line-index="' + e + '"]');
+		if (elem[0]) {
+			conf.setCurrentLine(e);
+			currentRect = elem[0];
+			updateCurrentLine(null);
+		}
+	});
+
+	// Restore selection
+	conf.setCurrentLine(origLine);
+	currentRect = origRect;
 }
 
 

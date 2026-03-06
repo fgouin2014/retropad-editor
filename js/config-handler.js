@@ -653,6 +653,98 @@ function ConfigHandler() {
 	}
 
 
+	// --- D-PAD LOGIC ---
+	
+	const dpadCommands = [
+		'dpad_up', 'dpad_down', 'dpad_left', 'dpad_right',
+		'dpad_left|up', 'dpad_right|up', 'dpad_left|down', 'dpad_right|down'
+	];
+
+	this.getDPadIndexes = function() {
+		let indexes = [];
+		for (let i = 0; i < _strings.length; i++) {
+			let param = _isOverlayXX_descYY(_strings[i]);
+			if (param) {
+				let cmd = _getParamSectionValue(_strings[i], 'command');
+				if (dpadCommands.includes(cmd)) {
+					indexes.push(i);
+				}
+			}
+		}
+		return indexes;
+	}
+
+	this.getDPadDimensions = function() {
+		let indexes = this.getDPadIndexes();
+		if (indexes.length == 0) return null;
+
+		let xMax = -Infinity;
+		let yMax = -Infinity;
+		let xMin = Infinity;
+		let yMin = Infinity;
+
+		for (let i = 0; i < indexes.length; i++) {
+			let index = indexes[i];
+			let x = Number(_getParamSectionValue(_strings[index], 'x'));
+			let y = Number(_getParamSectionValue(_strings[index], 'y'));
+			let w = Number(_getParamSectionValue(_strings[index], 'w'));
+			let h = Number(_getParamSectionValue(_strings[index], 'h'));
+
+			xMax = Math.max(xMax, x + w);
+			yMax = Math.max(yMax, y + h);
+			xMin = Math.min(xMin, x - w);
+			yMin = Math.min(yMin, y - h);
+		}
+
+		return {
+			x: (xMax + xMin) / 2,
+			y: (yMax + yMin) / 2,
+			w: (xMax - xMin) / 2,
+			h: (yMax - yMin) / 2,
+			indexes: indexes
+		};
+	}
+
+	this.setDPadSectionValue = function(section, sValue) {
+		let value = Number(sValue);
+		let center = this.getDPadDimensions();
+		if (!center) return;
+
+		let indexes = center.indexes;
+
+		for (let i = 0; i < indexes.length; i++) {
+			let index = indexes[i];
+			let x = Number(_getParamSectionValue(_strings[index], 'x'));
+			let y = Number(_getParamSectionValue(_strings[index], 'y'));
+			let w = Number(_getParamSectionValue(_strings[index], 'w'));
+			let h = Number(_getParamSectionValue(_strings[index], 'h'));
+			let confValue;
+
+			switch (section) {
+				case 'x':
+					confValue = x + value - center.x;
+					_strings[index] = _editParamSection(_strings[index], section, confValue.toFixed(10));
+					break;
+				case 'y':
+					confValue = y + value - center.y;
+					_strings[index] = _editParamSection(_strings[index], section, confValue.toFixed(10));
+					break;
+				case 's':
+					value = Math.max(value, 0.01);
+					// Scale w and h
+					_strings[index] = _editParamSection(_strings[index], 'w', (w * value).toFixed(10));
+					_strings[index] = _editParamSection(_strings[index], 'h', (h * value).toFixed(10));
+					// Scale distance from center
+					confValue = center.x + (x - center.x) * value;
+					_strings[index] = _editParamSection(_strings[index], 'x', confValue.toFixed(10));
+					confValue = center.y + (y - center.y) * value;
+					_strings[index] = _editParamSection(_strings[index], 'y', confValue.toFixed(10));
+					break;
+			}
+		}
+	}
+
+
 	//PRIVATE
 
 	function _cleanUp() {
