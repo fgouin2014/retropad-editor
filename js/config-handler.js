@@ -72,6 +72,11 @@ function ConfigHandler() {
 	}
 
 
+	this.isGroupSelected = function () {
+		return selectedButtonLineIndexes.length > 0;
+	}
+
+
 	this.setSelectionSectionValue = function (section, sValue) {
 		let value = Number(sValue);
 
